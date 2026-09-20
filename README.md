@@ -18,9 +18,9 @@ Las decisiones de diseño y el porqué de cada una están en
 
 ```bash
 pnpm install
-cp .env.example .env    # y rellenar los valores
-pnpm db:migrate         # crea las tablas
-pnpm dev                # http://localhost:3000
+cp .env.example .env.local   # y rellenar los valores
+pnpm db:migrate              # crea las tablas
+pnpm dev                     # http://localhost:3000
 ```
 
 Las variables de entorno están documentadas una a una en
@@ -39,9 +39,24 @@ Las variables de entorno están documentadas una a una en
 | `pnpm build` | Build de producción |
 | `pnpm typecheck` | TypeScript sin emitir |
 | `pnpm lint` | ESLint |
+| `pnpm test` | Tests (necesitan `TEST_DATABASE_URL`) |
 | `pnpm db:migrate` | Crea y aplica una migración |
+| `pnpm db:migrate:test` | Aplica las migraciones a la rama `test` |
 | `pnpm db:generate` | Regenera el cliente de Prisma |
 | `pnpm db:studio` | Explorador visual de la base de datos |
+
+## Tests
+
+Corren contra una base de datos Postgres real: la rama `test` de Neon, cuya
+cadena directa va en `TEST_DATABASE_URL`. No se simula la base de datos
+porque lo que se prueba es la atomicidad de la compra, y eso un mock no puede
+demostrarlo. Los tests crean y borran sus propias filas, así que esa variable
+nunca debe apuntar a la base real.
+
+```bash
+pnpm db:migrate:test   # solo la primera vez, o tras cambiar el esquema
+pnpm test
+```
 
 ## Estructura
 

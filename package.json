@@ -8,8 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:test": "prisma migrate deploy --config prisma.test.config.ts",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },
@@ -43,7 +46,8 @@
     "prisma": "7.10.0",
     "shadcn": "^4.21.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.1"
   },
   "packageManager": "pnpm@9.6.0"
 }
