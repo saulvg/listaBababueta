@@ -1,6 +1,6 @@
-import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaNeon } from '@prisma/adapter-neon'
 
-import { PrismaClient } from "@/lib/generated/prisma/client";
+import { PrismaClient } from '@/lib/generated/prisma/client'
 
 // Cliente de Prisma como singleton (CLAUDE.md §4).
 //
@@ -12,25 +12,25 @@ import { PrismaClient } from "@/lib/generated/prisma/client";
 // driver adapter. Aquí se usa DATABASE_URL, la cadena CON pooling.
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+  prisma: PrismaClient | undefined
+}
 
 function createPrismaClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString = process.env.DATABASE_URL
 
   if (!connectionString) {
     throw new Error(
-      "Falta la variable de entorno DATABASE_URL. Ver .env.example.",
-    );
+      'Falta la variable de entorno DATABASE_URL. Ver .env.example.',
+    )
   }
 
-  const adapter = new PrismaNeon({ connectionString });
+  const adapter = new PrismaNeon({ connectionString })
 
-  return new PrismaClient({ adapter });
+  return new PrismaClient({ adapter })
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
 }
