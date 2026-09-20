@@ -10,5 +10,5 @@ export default function HomePage() {
         compra.
       </p>
     </main>
-  );
+  )
 }
