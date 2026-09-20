@@ -24,6 +24,14 @@ Deliberadamente fuera: NextAuth, websockets, Redis, cola de mensajes, entorno de
    Lógica de servidor en app/api/\* como Route Handlers, no Server Actions sueltas repartidas por los componentes — mantiene la lógica de negocio centralizada y fácil de testear.
    Esquemas de validación Zod en lib/validations/, uno por entidad (list.ts, product.ts, auth.ts).
    Cliente de Prisma como singleton en lib/db.ts (patrón estándar de Next.js para evitar múltiples conexiones en desarrollo).
+
+   ### Convención de commits
+
+   Los commits los ejecuta siempre la persona, nunca el agente (bloqueado
+   además por permisos en `.claude/settings.json`). Ver skill
+   `proposing-commits` para el criterio de cuándo avisar y cómo proponer
+   el mensaje.
+
 5. Decisiones de arquitectura (el porqué, no solo el qué)
    Anti-doble-compra real: una transacción que actualiza el estado del producto SOLO SI sigue en disponible. Si la transacción no afecta ninguna fila, el servidor responde con error y el frontend avisa de que ya fue comprado. Esta es la única garantía dura.
    "Alguien lo está mirando": aviso cosmético mediante polling (cada pocos segundos), no websockets. Es solo UX; la garantía real vive en el punto anterior.

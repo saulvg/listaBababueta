@@ -4,7 +4,8 @@
       "Read(./.env*)",
       "Write(./.env*)",
       "Edit(./.env*)",
-      "Bash(cat .env*)"
+      "Bash(cat .env*)",
+      "Bash(git commit:*)"
     ],
     "ask": ["Bash(rm:*)", "Bash(git push:*)"]
   }
