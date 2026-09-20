@@ -1,0 +1,80 @@
+// Esquema de datos de listaBababueta.
+// Ver CLAUDE.md secciones 3 y 5 para el porqué de cada decisión.
+
+generator client {
+  // Prisma 7: el generator `prisma-client` sustituye al antiguo
+  // `prisma-client-js` (deprecado) y exige una ruta de salida explícita.
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  // Prisma 7 ya no admite `url` ni `directUrl` aquí: la conexión de las
+  // migraciones vive en prisma.config.ts y la de runtime en el driver
+  // adapter que se le pasa a PrismaClient (ver lib/db.ts).
+  provider = "postgresql"
+}
+
+/// Una lista de regalos. No hay tabla de usuarios: las listas pertenecen
+/// implícitamente a la cuenta familiar definida en variables de entorno.
+model List {
+  id        String   @id @default(cuid())
+  title     String
+  /// Parte visible de la URL pública: /lista/<slug>
+  slug      String   @unique
+  /// Clave de acceso en TEXTO PLANO, a propósito (CLAUDE.md §5): los padres
+  /// necesitan volver a leerla para compartirla. Único requisito: no vacía.
+  /// Se protege con rate limiting en el endpoint de acceso, no con hash.
+  accessKey String   @map("access_key")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@map("lists")
+}
+
+/// Estado de un producto. El paso a COMPRADO es la única operación del
+/// proyecto con concurrencia real (CLAUDE.md §5).
+enum ProductStatus {
+  DISPONIBLE
+  COMPRADO
+
+  @@map("product_status")
+}
+
+model Product {
+  id     String @id @default(cuid())
+  listId String @map("list_id")
+  list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  title String
+  /// Enlace a la tienda. Opcional.
+  url   String?
+  /// Precio estimado en CÉNTIMOS, como entero: evita los errores de coma
+  /// flotante y no obliga a arrastrar el tipo Decimal de Prisma.
+  priceCents Int? @map("price_cents")
+  comment    String?
+  /// URL de una imagen externa. No hay subida de ficheros (CLAUDE.md §3).
+  imageUrl   String? @map("image_url")
+
+  status ProductStatus @default(DISPONIBLE)
+  /// Texto libre. Nulo o vacío = compra anónima.
+  purchasedBy String?   @map("purchased_by")
+  purchasedAt DateTime? @map("purchased_at")
+
+  // --- Soft lock de visualización (CLAUDE.md §3 y §5) ----------------------
+  // Aviso cosmético de "alguien lo está mirando", alimentado por polling.
+  // NO es la garantía de no-doble-compra: esa vive en la actualización
+  // condicional del estado. Expira sola a los pocos minutos, por eso se
+  // guarda el instante y se compara al leer en vez de limpiarlo con un cron.
+  viewerId    String?   @map("viewer_id")
+  viewingFrom DateTime? @map("viewing_from")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // La vista pública siempre filtra por lista.
+  @@index([listId])
+  @@map("products")
+}

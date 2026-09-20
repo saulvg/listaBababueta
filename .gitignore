@@ -4,6 +4,14 @@ node_modules/
 # build de Next.js
 .next/
 out/
+next-env.d.ts
+*.tsbuildinfo
+
+# cliente de Prisma generado — se regenera con `pnpm prisma generate`
+lib/generated/
+
+# cobertura de tests
+coverage/
 
 # variables de entorno — nunca se commitean
 .env
