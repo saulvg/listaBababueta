@@ -1,0 +1,23 @@
+# dependencias
+node_modules/
+
+# build de Next.js
+.next/
+out/
+
+# variables de entorno — nunca se commitean
+.env
+.env*.local
+
+# Vercel
+.vercel
+
+# overrides personales de Claude Code (no se comparten)
+.claude/settings.local.json
+
+# ficheros de estado efímeros (Mecanismo B)
+.claude/state/
+
+# sistema
+.DS_Store
+*.log
