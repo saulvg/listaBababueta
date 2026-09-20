@@ -64,6 +64,10 @@ model Product {
   purchasedAt DateTime? @map("purchased_at")
 
   // --- Soft lock de visualización (CLAUDE.md §3 y §5) ----------------------
+  // TODO: columnas creadas pero SIN USAR todavía. Falta el endpoint de latido
+  // y el polling desde la UI; se monta cuando haya pantallas con las que ver
+  // si el aviso ayuda o estorba.
+  //
   // Aviso cosmético de "alguien lo está mirando", alimentado por polling.
   // NO es la garantía de no-doble-compra: esa vive en la actualización
   // condicional del estado. Expira sola a los pocos minutos, por eso se
