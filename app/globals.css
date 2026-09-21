@@ -32,6 +32,27 @@
     }
   }
 
+  /* El temblorcillo del título de la portada (app/(public)/titulo-secreto.tsx).
+     Movimientos de un píxel y giros de medio grado: tiene que parecer que le
+     cuesta contener el secreto, no que se ha roto la página. */
+  --animate-tiembla: tiembla 0.35s ease-in-out infinite;
+
+  @keyframes tiembla {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+      transform: translate(-1px, 1px) rotate(-0.6deg);
+    }
+    50% {
+      transform: translate(1px, -1px) rotate(0.6deg);
+    }
+    75% {
+      transform: translate(-1px, -1px) rotate(-0.4deg);
+    }
+  }
+
   @keyframes bache {
     0%,
     100% {
