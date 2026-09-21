@@ -5,6 +5,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 import { EmojiBilletes } from './emoji-billetes'
+import { TituloSecreto } from './titulo-secreto'
 
 // Portada. Dos caminos, con pesos muy distintos a propósito: el de la familia
 // es un botón que ocupa media pantalla, y el de los padres, un enlace pequeño
@@ -17,7 +18,7 @@ export default function HomePage() {
       </span>
 
       <div className="space-y-3">
-        <h1 className="text-4xl">Lista Bababueta</h1>
+        <TituloSecreto />
         <p className="text-balance text-muted-foreground">
           Nuestras listas de cosas para Cacahueta.
           <br />
