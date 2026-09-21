@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-import { EmojiBilletes } from './emoji-billetes'
+import { EmojiAnimado } from './emoji-animado'
 import { TituloSecreto } from './titulo-secreto'
 
 // Portada. Dos caminos, con pesos muy distintos a propósito: el de la familia
@@ -22,10 +22,10 @@ export default function HomePage() {
         <p className="text-balance text-muted-foreground">
           Nuestras listas de cosas para Cacahueta.
           <br />
-          Puedes cotillear lo que hemos considerado que va a necesitar 👀. Es
-          solo una guía por si te apetece regalarle algo. <br /> Si ves algo que
-          te hace ilusión adelante
-          <EmojiBilletes />
+          Puedes cotillear lo que hemos considerado que va a necesitar{' '}
+          <EmojiAnimado src="/ojos.webp" fallback="👀" />. Es solo una guía por
+          si te apetece regalarle algo. <br /> Si ves algo que te hace ilusión
+          adelante <EmojiAnimado src="/billetes.webp" fallback="💸" />
           <br /> <br />
           <span className="font-bold text-warning">IMPORTANTE:</span> Marca como
           comprado una vez te decidas, antes incluso de haberlo comprado asi si
