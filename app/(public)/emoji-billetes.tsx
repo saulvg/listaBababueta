@@ -12,7 +12,7 @@ export function EmojiBilletes() {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f4b8.gif"
+      src="/billetes.webp"
       alt=""
       aria-hidden
       onError={() => setFalla(true)}

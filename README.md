@@ -71,15 +71,16 @@ escribe en consola qué ha pasado.
 
 ## Las pantallas
 
-| Ruta                        | Quién   | Qué hay                                            |
-| --------------------------- | ------- | -------------------------------------------------- |
-| `/`                         | Todos   | Portada: botón a las listas y acceso de padres     |
-| `/listas`                   | Familia | Todas las listas, con candado abierto o cerrado    |
-| `/lista/[slug]`             | Familia | Los regalos, o el formulario de la clave si no hay |
-| `/lista/[slug]/[productId]` | Familia | Un regalo, con "marcar como comprado"              |
-| `/entrar`                   | Padres  | Login                                              |
-| `/panel`                    | Padres  | Vuestras listas: crear, editar, compartir enlace   |
-| `/panel/[listId]`           | Padres  | Los regalos de una lista: crear, editar, borrar    |
+| Ruta                        | Quién   | Qué hay                                             |
+| --------------------------- | ------- | --------------------------------------------------- |
+| `/`                         | Todos   | Portada: botón a las listas y acceso de padres      |
+| `/listas`                   | Familia | Todas las listas, con candado abierto o cerrado     |
+| `/lista/[slug]`             | Familia | Los regalos, o el formulario de la clave si no hay  |
+| `/lista/[slug]/[productId]` | Familia | Un regalo, con "marcar como comprado"               |
+| `/aviso-legal`              | Todos   | Qué se guarda y a quién escribir (enlace en el pie) |
+| `/entrar`                   | Padres  | Login                                               |
+| `/panel`                    | Padres  | Vuestras listas: crear, editar, compartir enlace    |
+| `/panel/[listId]`           | Padres  | Los regalos de una lista: crear, editar, borrar     |
 
 Las páginas que necesitan datos son componentes de cliente y hablan con la API
 por `fetch`, nunca con Prisma. El sobre de error lo desenvuelve un único
