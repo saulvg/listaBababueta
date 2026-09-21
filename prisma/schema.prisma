@@ -26,6 +26,11 @@ model List {
   /// necesitan volver a leerla para compartirla. Único requisito: no vacía.
   /// Se protege con rate limiting en el endpoint de acceso, no con hash.
   accessKey String   @map("access_key")
+  /// Dónde enviar los regalos, para quien compra en una tienda online. Texto
+  /// LIBRE y opcional, no un formulario de dirección: así los padres deciden
+  /// cuánto cuentan — la dirección entera o un "escríbenos y te la pasamos".
+  /// Solo sale tras la clave de la lista; nunca en el índice público.
+  shippingAddress String? @map("shipping_address")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

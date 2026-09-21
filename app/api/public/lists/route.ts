@@ -10,8 +10,10 @@ import { prisma } from '@/lib/db'
 // cada lista, no su existencia. A cambio, un familiar no necesita que le
 // manden un enlace concreto: entra, ve "Reyes 2026" y mete la clave.
 //
-// `accessKey` no aparece en el select. No es un descuido que se pueda cometer
-// dos veces: si alguien añade aquí un `include` o quita el select, se filtra.
+// Ni `accessKey` ni `shippingAddress` aparecen en el select, y este es el
+// único endpoint de listas que no pide clave: si alguien añade aquí un
+// `include` o quita el select, publica la clave de todas las listas y la
+// dirección de casa de paso.
 
 export const GET = route(async () => {
   const sesion = await getGuestSession()

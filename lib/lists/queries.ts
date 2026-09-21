@@ -12,10 +12,22 @@ import { prisma } from '@/lib/db'
  *
  * `accessKey` no sale de aquí: no está en el select, y no lo está a
  * propósito. Quien necesite comprobar la clave usa requireListAccess.
+ *
+ * `shippingAddress` SÍ sale, y por eso hay que mirar dónde se usa esto: el
+ * Route Handler lo devuelve después de `requireListAccess`, y el
+ * `generateMetadata` de la página no lo toca. Una dirección de casa no puede
+ * acabar en una vista previa de WhatsApp ni en el índice de listas, que es
+ * público.
  */
 export function findListBySlug(slug: string) {
   return prisma.list.findUnique({
     where: { slug },
-    select: { id: true, title: true, slug: true, createdAt: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      shippingAddress: true,
+      createdAt: true,
+    },
   })
 }

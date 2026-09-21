@@ -1,6 +1,6 @@
 'use client'
 
-import { ExternalLink } from 'lucide-react'
+import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
 import { AccessGate } from '@/components/access-gate'
@@ -17,6 +17,49 @@ import { formatearPrecio } from '@/lib/format/price'
 import { useApi } from '@/lib/hooks/use-api'
 import { cn } from '@/lib/utils'
 import { purchaseProductSchema } from '@/lib/validations/product'
+
+/**
+ * Dónde enviar el regalo, con botón de copiar.
+ *
+ * Se enseña entera y desde que se entra, no detrás de un desplegable ni solo
+ * al marcar como comprado: quien llega aquí ya ha pasado la clave, y lo
+ * normal es que esté a punto de pegar estas señas en una tienda. Lo escriben
+ * los padres en texto libre (puede ser una dirección o un "escribidnos"), así
+ * que se respetan sus saltos de línea y no se le da formato de nada.
+ */
+function DireccionDeEnvio({ direccion }: { direccion: string }) {
+  const [copiada, setCopiada] = useState(false)
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(direccion)
+      setCopiada(true)
+      window.setTimeout(() => setCopiada(false), 2000)
+    } catch {
+      // Sin portapapeles (navegador viejo, o servido sin https) no hay nada
+      // que avisar: la dirección está a la vista y se puede seleccionar a
+      // mano, que es justo lo que se hacía antes de que existiera el botón.
+    }
+  }
+
+  return (
+    <div className="space-y-2 rounded-xl border bg-muted/40 p-3">
+      <p className="text-xs font-medium text-muted-foreground">
+        Dónde enviarlo
+      </p>
+      <p className="whitespace-pre-line text-sm">{direccion}</p>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => void copiar()}
+      >
+        {copiada ? <Check aria-hidden /> : <Copy aria-hidden />}
+        {copiada ? 'Copiado' : 'Copiar'}
+      </Button>
+    </div>
+  )
+}
 
 export function VistaRegalo({
   slug,
@@ -132,6 +175,12 @@ export function VistaRegalo({
 
           {datos.product.comment && (
             <p className="whitespace-pre-line">{datos.product.comment}</p>
+          )}
+
+          {/* Antes del botón de la tienda a propósito: es el dato que hace
+              falta justo al comprar, no después. */}
+          {datos.list.shippingAddress && (
+            <DireccionDeEnvio direccion={datos.list.shippingAddress} />
           )}
 
           {datos.product.url && (

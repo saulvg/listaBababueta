@@ -71,16 +71,16 @@ escribe en consola qué ha pasado.
 
 ## Las pantallas
 
-| Ruta                        | Quién   | Qué hay                                             |
-| --------------------------- | ------- | --------------------------------------------------- |
-| `/`                         | Todos   | Portada: botón a las listas y acceso de padres      |
-| `/listas`                   | Familia | Todas las listas, con candado abierto o cerrado     |
-| `/lista/[slug]`             | Familia | Los regalos, o el formulario de la clave si no hay  |
-| `/lista/[slug]/[productId]` | Familia | Un regalo, con "marcar como comprado"               |
-| `/aviso-legal`              | Todos   | Qué se guarda y a quién escribir (enlace en el pie) |
-| `/entrar`                   | Padres  | Login                                               |
-| `/panel`                    | Padres  | Vuestras listas: crear, editar, compartir enlace    |
-| `/panel/[listId]`           | Padres  | Los regalos de una lista: crear, editar, borrar     |
+| Ruta                        | Quién   | Qué hay                                                              |
+| --------------------------- | ------- | -------------------------------------------------------------------- |
+| `/`                         | Todos   | Portada: botón a las listas y acceso de padres                       |
+| `/listas`                   | Familia | Todas las listas, con candado abierto o cerrado                      |
+| `/lista/[slug]`             | Familia | Los regalos, o el formulario de la clave si no hay                   |
+| `/lista/[slug]/[productId]` | Familia | Un regalo, con "marcar como comprado" y a dónde enviarlo             |
+| `/aviso-legal`              | Todos   | Qué se guarda y a quién escribir (enlace en el pie)                  |
+| `/entrar`                   | Padres  | Login                                                                |
+| `/panel`                    | Padres  | Vuestras listas: crear, editar, compartir enlace, dirección de envío |
+| `/panel/[listId]`           | Padres  | Los regalos de una lista: crear, editar, borrar                      |
 
 Las páginas que necesitan datos son componentes de cliente y hablan con la API
 por `fetch`, nunca con Prisma. El sobre de error lo desenvuelve un único
@@ -96,21 +96,21 @@ un fogonazo blanco en cada carga.
 La frontera de seguridad está en la URL — todo lo que cuelga de `/api/public/`
 es para la familia, y el resto exige sesión de padres.
 
-| Ruta                                        | Métodos            | Quién                          |
-| ------------------------------------------- | ------------------ | ------------------------------ |
-| `/api/auth/login`                           | POST               | Público (con rate limiting)    |
-| `/api/auth/logout`                          | POST               | —                              |
-| `/api/auth/session`                         | GET                | Devuelve quién eres            |
-| `/api/admin/lists`                          | GET, POST          | Padres                         |
-| `/api/admin/lists/[listId]`                 | GET, PATCH, DELETE | Padres                         |
-| `/api/admin/lists/[listId]/products`        | GET, POST          | Padres                         |
-| `/api/admin/products/[productId]`           | PATCH, DELETE      | Padres                         |
-| `/api/admin/products/[productId]/purchase`  | POST, DELETE       | Padres (marcar y desmarcar)    |
-| `/api/public/lists`                         | GET                | Cualquiera (solo títulos)      |
-| `/api/public/lists/[slug]/access`           | POST               | Cualquiera (con rate limiting) |
-| `/api/public/lists/[slug]`                  | GET                | Quien haya acertado la clave   |
-| `/api/public/products/[productId]`          | GET                | Quien haya acertado la clave   |
-| `/api/public/products/[productId]/purchase` | POST               | Quien haya acertado la clave   |
+| Ruta                                        | Métodos            | Quién                                            |
+| ------------------------------------------- | ------------------ | ------------------------------------------------ |
+| `/api/auth/login`                           | POST               | Público (con rate limiting)                      |
+| `/api/auth/logout`                          | POST               | —                                                |
+| `/api/auth/session`                         | GET                | Devuelve quién eres                              |
+| `/api/admin/lists`                          | GET, POST          | Padres                                           |
+| `/api/admin/lists/[listId]`                 | GET, PATCH, DELETE | Padres                                           |
+| `/api/admin/lists/[listId]/products`        | GET, POST          | Padres                                           |
+| `/api/admin/products/[productId]`           | PATCH, DELETE      | Padres                                           |
+| `/api/admin/products/[productId]/purchase`  | POST, DELETE       | Padres (marcar y desmarcar)                      |
+| `/api/public/lists`                         | GET                | Cualquiera (solo títulos: ni clave ni dirección) |
+| `/api/public/lists/[slug]/access`           | POST               | Cualquiera (con rate limiting)                   |
+| `/api/public/lists/[slug]`                  | GET                | Quien haya acertado la clave                     |
+| `/api/public/products/[productId]`          | GET                | Quien haya acertado la clave                     |
+| `/api/public/products/[productId]/purchase` | POST               | Quien haya acertado la clave                     |
 
 Los errores siempre vienen en el mismo sobre, con un `code` para el código y
 un `message` para la persona:

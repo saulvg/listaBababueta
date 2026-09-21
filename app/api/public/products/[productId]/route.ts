@@ -31,7 +31,13 @@ export const GET = route<Contexto>(async (_request, { params }) => {
       status: true,
       purchasedBy: true,
       purchasedAt: true,
-      list: { select: { id: true, title: true, slug: true } },
+      // La dirección de envío viaja con el regalo porque es justo aquí donde
+      // se necesita: quien está a punto de comprar en una tienda no tiene por
+      // qué volver a la lista a buscarla. Sale después de requireListAccess,
+      // nunca antes.
+      list: {
+        select: { id: true, title: true, slug: true, shippingAddress: true },
+      },
     },
   })
 
