@@ -16,7 +16,8 @@ Deliberadamente fuera: NextAuth, websockets, Redis, cola de mensajes, entorno de
 
 3. Modelo de datos (resumen)
    Cuentas de los padres — no es una tabla de usuarios. Son DOS cuentas fijas (email + hash bcrypt) en variables de entorno: PARENT_1_* y PARENT_2_*. No hay registro abierto.
-   lists: id, título, slug (parte visible de la URL, derivada del título al crear y luego inmutable para no romper enlaces ya compartidos), access_key (texto plano, definida y editable por los padres, único requisito: no vacía), fecha de creación.
+   lists: id, título, slug (parte visible de la URL, derivada del título al crear y luego inmutable para no romper enlaces ya compartidos), access_key (texto plano, definida y editable por los padres, único requisito: no vacía), shipping_address (dónde enviar los regalos: texto LIBRE y opcional, no un formulario de dirección, para que los padres decidan si ponen las señas o un "escribidnos"), fecha de creación.
+   La dirección solo sale por endpoints que ya han pasado la clave de la lista. El índice público (/api/public/lists) no la devuelve, igual que no devuelve access_key: es el único endpoint de listas sin clave y ahí el select explícito es la única barrera.
    products: id, list_id (FK a lists), título, enlace, precio estimado, comentario, imagen (URL, sin subida de ficheros), estado (disponible / comprado), comprado_por (texto libre, nullable — anónimo si se deja vacío).
    El precio se guarda en CÉNTIMOS como entero (priceCents): evita los errores de coma flotante y no obliga a arrastrar el tipo Decimal de Prisma. La conversión desde euros es cosa del formulario.
    Los campos del esquema van en inglés camelCase con @map a snake_case.

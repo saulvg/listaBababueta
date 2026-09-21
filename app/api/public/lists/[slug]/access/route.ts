@@ -30,7 +30,13 @@ export const POST = route<Contexto>(async (request, { params }) => {
 
   const lista = await prisma.list.findUnique({
     where: { slug },
-    select: { id: true, title: true, slug: true, accessKey: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      shippingAddress: true,
+      accessKey: true,
+    },
   })
 
   if (!lista) {
@@ -47,7 +53,15 @@ export const POST = route<Contexto>(async (request, { params }) => {
   await grantListAccess(lista.id)
   resetRateLimit(clavePorLista)
 
+  // Se devuelve la lista sin la clave, campo a campo: aquí no vale un
+  // `...lista` menos accessKey, porque el día que el select crezca el olvido
+  // se publica solo.
   return jsonOk({
-    list: { id: lista.id, title: lista.title, slug: lista.slug },
+    list: {
+      id: lista.id,
+      title: lista.title,
+      slug: lista.slug,
+      shippingAddress: lista.shippingAddress,
+    },
   })
 })

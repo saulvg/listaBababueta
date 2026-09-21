@@ -2,6 +2,11 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono, Indie_Flower } from 'next/font/google'
 import './globals.css'
 
+import {
+  DESCRIPCION_GENERAL,
+  OPEN_GRAPH_BASE,
+  URL_PUBLICA,
+} from '@/lib/metadata'
 import { SCRIPT_DE_TEMA } from '@/lib/theme'
 
 const geistSans = Geist({
@@ -22,8 +27,22 @@ const indieFlower = Indie_Flower({
 })
 
 export const metadata: Metadata = {
-  title: 'Lista Bababueta',
-  description: 'Listas de regalos para compartir con la familia',
+  // Sin esto las URLs de la vista previa salen relativas, y WhatsApp, que no
+  // las resuelve, no enseña imagen. Sale de NEXT_PUBLIC_APP_URL: si falta en
+  // el despliegue, apunta a localhost y la vista previa se queda muda.
+  metadataBase: new URL(URL_PUBLICA),
+  title: {
+    default: 'Lista Bababueta',
+    // Cada página pone solo lo suyo ("Reyes 2026") y el sufijo lo añade esto.
+    template: '%s · Lista Bababueta',
+  },
+  description: DESCRIPCION_GENERAL,
+  openGraph: {
+    ...OPEN_GRAPH_BASE,
+    title: 'Lista Bababueta',
+    description: DESCRIPCION_GENERAL,
+    url: '/',
+  },
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

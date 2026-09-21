@@ -36,6 +36,9 @@ export type ListHeader = {
   id: string
   title: string
   slug: string
+  /** Dónde enviar los regalos. Texto libre de los padres, o null si no han
+   *  puesto nada. Solo viaja en respuestas que ya han pasado la clave. */
+  shippingAddress: string | null
   createdAt: string
 }
 

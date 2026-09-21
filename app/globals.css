@@ -5,14 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* El carrito de la pantalla de espera (components/loader.tsx): va del punto
-     A al B, se da la vuelta y regresa. El giro es un scaleX, para que siempre
-     mire hacia donde va, y la distancia sale de --recorrido, que pone la
-     pista: así cambiar el ancho de la pista no obliga a tocar esto. */
-  --animate-paseo: paseo 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  /* Los baches del camino. Va en un elemento aparte, dentro del anterior,
+  /* El cacahuete de la pantalla de espera (components/loader.tsx): va del
+     punto A al B, se da la vuelta y regresa. El giro es un scaleX, para que
+     siempre mire hacia donde va, y la distancia sale de --recorrido, que pone
+     la pista: así cambiar el ancho de la pista no obliga a tocar esto. */
+  --animate-paseo: paseo 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  /* Los tumbos del camino. Va en un elemento aparte, dentro del anterior,
      porque los dos animan `transform` y uno pisaría al otro. */
-  --animate-bache: bache 0.55s ease-in-out infinite;
+  --animate-bache: bache 0.9s ease-in-out infinite;
 
   @keyframes paseo {
     0% {
@@ -53,13 +53,15 @@
     }
   }
 
+  /* Un tumbo: se alza un poco y se ladea. El giro es de dos grados porque el
+     dibujo ya va inclinado y cualquier cosa mayor parece que se cae. */
   @keyframes bache {
     0%,
     100% {
-      transform: translateY(0);
+      transform: translateY(0) rotate(0deg);
     }
     50% {
-      transform: translateY(-2px);
+      transform: translateY(-2px) rotate(-2deg);
     }
   }
 

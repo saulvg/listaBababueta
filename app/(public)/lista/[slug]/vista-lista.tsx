@@ -57,7 +57,7 @@ export function VistaLista({ slug }: { slug: string }) {
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-16 sm:px-6">
-      {cargando && <Loader texto="Sacando los regalos del carrito…" />}
+      {cargando && <Loader texto="Cacahueta va a por los regalos…" />}
 
       {error && !cargando ? (
         <div className="space-y-4">

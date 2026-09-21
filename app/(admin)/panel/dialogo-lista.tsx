@@ -14,13 +14,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { api, mensajeDeError } from '@/lib/api/client'
 import type { AdminList, AdminListResponse } from '@/lib/api/types'
 import { erroresDeApi, erroresDeZod, type ErroresDeCampo } from '@/lib/forms'
 import { createListSchema, updateListSchema } from '@/lib/validations/list'
 
 /**
- * Crear o editar una lista. Es el mismo formulario porque son los mismos dos
+ * Crear o editar una lista. Es el mismo formulario porque son los mismos
  * campos; lo único que cambia es a dónde va la petición.
  *
  * El estado inicial se toma de `lista` en el primer render, así que quien lo
@@ -47,6 +48,9 @@ export function DialogoLista({
 
   const [title, setTitle] = useState(lista?.title ?? '')
   const [accessKey, setAccessKey] = useState(lista?.accessKey ?? '')
+  const [shippingAddress, setShippingAddress] = useState(
+    lista?.shippingAddress ?? '',
+  )
   const [errores, setErrores] = useState<ErroresDeCampo>({})
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -55,7 +59,7 @@ export function DialogoLista({
     evento.preventDefault()
 
     const esquema = editando ? updateListSchema : createListSchema
-    const validacion = esquema.safeParse({ title, accessKey })
+    const validacion = esquema.safeParse({ title, accessKey, shippingAddress })
 
     if (!validacion.success) {
       setErrores(erroresDeZod(validacion.error))
@@ -130,6 +134,23 @@ export function DialogoLista({
                 autoComplete="off"
                 autoCapitalize="none"
                 spellCheck={false}
+              />
+            )}
+          </Field>
+
+          <Field
+            label="Dónde enviarlo (opcional)"
+            error={errores.shippingAddress}
+            hint="Se ve en la pantalla de cada regalo, solo para quien tenga la clave. Podéis poner las señas completas o decir que os escriban."
+          >
+            {(props) => (
+              <Textarea
+                {...props}
+                value={shippingAddress}
+                onChange={(evento) => setShippingAddress(evento.target.value)}
+                placeholder={'Calle de ejemplo, 3, 2º B\n28000 Madrid'}
+                rows={3}
+                maxLength={500}
               />
             )}
           </Field>
