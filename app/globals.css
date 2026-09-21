@@ -5,11 +5,51 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* El carrito de la pantalla de espera (components/loader.tsx): va del punto
+     A al B, se da la vuelta y regresa. El giro es un scaleX, para que siempre
+     mire hacia donde va, y la distancia sale de --recorrido, que pone la
+     pista: así cambiar el ancho de la pista no obliga a tocar esto. */
+  --animate-paseo: paseo 2.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  /* Los baches del camino. Va en un elemento aparte, dentro del anterior,
+     porque los dos animan `transform` y uno pisaría al otro. */
+  --animate-bache: bache 0.55s ease-in-out infinite;
+
+  @keyframes paseo {
+    0% {
+      transform: translateX(0) scaleX(1);
+    }
+    45% {
+      transform: translateX(var(--recorrido, 10rem)) scaleX(1);
+    }
+    50% {
+      transform: translateX(var(--recorrido, 10rem)) scaleX(-1);
+    }
+    95% {
+      transform: translateX(0) scaleX(-1);
+    }
+    100% {
+      transform: translateX(0) scaleX(1);
+    }
+  }
+
+  @keyframes bache {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-2px);
+    }
+  }
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-display: var(--font-display);
+  /* Los titulares van en manuscrita: "Lista de deseos", el nombre de la
+     lista, el título de un regalo. El resto, en sans. */
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -34,11 +74,16 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-ink: var(--primary-ink);
   --color-primary: var(--primary);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning: var(--warning);
+  --color-success-foreground: var(--success-foreground);
+  --color-success: var(--success);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,14 +94,31 @@
 }
 
 :root {
+  /* Las tres familias las inyecta next/font desde app/layout.tsx; aquí solo
+     se les pone nombre y una pila de reserva por si la fuente no carga. */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-indie-flower), 'Segoe Script', cursive;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  /* Azul profundo: el botón de acción de los bocetos. El resto de la paleta
+     se queda neutra a propósito, para que el azul signifique "pulsa aquí". */
+  --primary: oklch(0.42 0.13 259);
+  --primary-foreground: oklch(0.985 0.005 250);
+  /* El azul cuando hace de TINTA (un icono, un enlace) en vez de de relleno.
+     En claro es el mismo; en oscuro no puede serlo, porque ahí el relleno es
+     un azul marino que sobre el fondo negro no se lee. */
+  --primary-ink: var(--primary);
+  /* Dos colores de estado que shadcn no trae: el verde de "ya comprado" y el
+     ámbar de los avisos. Se usan como texto y como fondo al 10%. */
+  --success: oklch(0.52 0.13 152);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.52 0.11 72);
+  --warning-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -66,7 +128,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.55 0.12 259);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -90,8 +152,15 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  /* En oscuro el botón NO se invierte a blanco: los bocetos lo pintan como un
+     azul marino relleno con el texto claro, y eso es lo que se copia. */
+  --primary: oklch(0.34 0.1 259);
+  --primary-foreground: oklch(0.88 0.06 250);
+  --primary-ink: oklch(0.75 0.11 259);
+  --success: oklch(0.75 0.16 152);
+  --success-foreground: oklch(0.2 0.04 152);
+  --warning: oklch(0.79 0.14 78);
+  --warning-foreground: oklch(0.22 0.04 70);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -101,7 +170,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.5 0.09 259);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -126,5 +195,23 @@
   }
   html {
     @apply font-sans;
+  }
+  /* Indie Flower solo tiene un grosor, así que los titulares no llevan
+     negrita: se distinguen por tamaño y por ser de otra familia. Tampoco se
+     les aprieta el espaciado — una manuscrita ya viene con el suyo y
+     estrecharlo la emborrona. */
+  h1,
+  h2,
+  h3 {
+    @apply font-heading font-normal;
+  }
+  /* Mano al pasar por encima de lo que se puede pulsar.
+     Tailwind 4 cambió su preflight y ahora deja los <button> con el cursor
+     de flecha (el del navegador); en la v3 eran mano. Los enlaces no entran
+     aquí: un <a href> ya la trae de serie.
+     Se excluyen los deshabilitados — la mano promete algo que no va a pasar. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    @apply cursor-pointer;
   }
 }

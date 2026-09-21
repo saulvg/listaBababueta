@@ -9,7 +9,7 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "check:docs": "node scripts/check-doc-sizes.mjs",
     "hash:password": "node scripts/hash-password.mjs",
     "test": "vitest run",

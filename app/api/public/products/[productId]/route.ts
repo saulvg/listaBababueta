@@ -1,0 +1,55 @@
+import { ApiError, jsonOk } from '@/lib/api/responses'
+import { route } from '@/lib/api/route'
+import { requireListAccess } from '@/lib/auth/session'
+import { prisma } from '@/lib/db'
+
+// GET /api/public/products/[productId] — un regalo suelto.
+//
+// Existe porque el detalle de un regalo es una página con URL propia y
+// compartible (/lista/<slug>/<id>): quien la abre directa desde un mensaje no
+// ha pasado por la lista, así que no hay nada cargado de lo que sacar el
+// producto.
+//
+// Devuelve también el título y el slug de su lista, que es lo que necesita la
+// pantalla para la cabecera y para el enlace de volver — y así no hace una
+// segunda petición para eso.
+
+type Contexto = { params: Promise<{ productId: string }> }
+
+export const GET = route<Contexto>(async (_request, { params }) => {
+  const { productId } = await params
+
+  const producto = await prisma.product.findUnique({
+    where: { id: productId },
+    select: {
+      id: true,
+      title: true,
+      url: true,
+      priceCents: true,
+      comment: true,
+      imageUrl: true,
+      status: true,
+      purchasedBy: true,
+      purchasedAt: true,
+      list: { select: { id: true, title: true, slug: true } },
+    },
+  })
+
+  if (!producto) {
+    throw new ApiError(
+      404,
+      'product_not_found',
+      'Ese regalo ya no está en la lista.',
+    )
+  }
+
+  // La misma guarda que en la lista entera: el id de un producto no puede ser
+  // una rendija para ver el contenido de una lista cuya clave no se conoce.
+  // El 403 `list_locked` es lo que hace que la pantalla enseñe el formulario
+  // de la clave en vez de un error.
+  await requireListAccess(producto.list.id)
+
+  const { list, ...regalo } = producto
+
+  return jsonOk({ product: regalo, list })
+})
