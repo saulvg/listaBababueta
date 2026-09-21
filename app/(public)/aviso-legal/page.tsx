@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 
 import { BackLink } from '@/components/back-link'
 
-// ⚠️ PON AQUÍ EL CORREO DE CONTACTO antes de desplegar. Es el único dato que
-// falta y el único sitio donde hay que cambiarlo.
 const CONTACTO = 'saulvgproyecto@gmail.com'
 
 const ACTUALIZADO = 'septiembre de 2026'
@@ -74,7 +72,9 @@ export default function AvisoLegalPage() {
             <li>
               <strong>Las listas y los regalos</strong> que escriben los padres:
               título, enlace a la tienda, precio aproximado, comentario e
-              imagen.
+              imagen. Y, si la ponen, la dirección a la que enviar los regalos,
+              que solo aparece dentro de la lista y nunca antes de meter la
+              clave.
             </li>
             <li>
               <strong>El nombre que escribes al marcar un regalo</strong>, si lo
@@ -99,7 +99,8 @@ export default function AvisoLegalPage() {
           <p>
             El contenido de cada lista lo ve quien tenga su clave de acceso. Los
             títulos de las listas sí se ven sin clave, para que quien haya
-            perdido el enlace pueda encontrar la suya; lo de dentro, no.
+            perdido el enlace pueda encontrar la suya; lo de dentro, incluida la
+            dirección de envío, no.
           </p>
           <p>
             Los datos no se venden ni se ceden a nadie. Los tres servicios que
