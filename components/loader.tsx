@@ -1,37 +1,17 @@
 /**
- * Carrito de bebé, dibujado a mano en el estilo de lucide (trazo de 2,
- * extremos redondeados, lienzo de 24) porque lucide no trae ninguno: solo
- * tiene `Baby`, que es una cara.
- */
-function Carrito({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden
-    >
-      {/* La capota va rellena: a este tamaño, a trazo suelto no se
-          reconocería. */}
-      <path d="M17 12a7 7 0 0 0-14 0Z" fill="currentColor" stroke="none" />
-      <path d="M3 12h14" />
-      <path d="m17 12 2.4-6" />
-      <path d="M18 6h3" />
-      <path d="M6 12v3.5" />
-      <path d="M14 12v3.5" />
-      <circle cx="6" cy="17.5" r="2" />
-      <circle cx="14" cy="17.5" r="2" />
-    </svg>
-  )
-}
-
-/**
- * Pantalla de espera. Un carrito que va del punto A al punto B y vuelve,
- * dando botes, mientras se cargan los datos.
+ * Pantalla de espera. Cacahueta yendo del punto A al punto B y volviendo, a
+ * tumbos, mientras se cargan los datos.
+ *
+ * Es el mismo cacahuete que hace de icono de la app, servido desde `public/`
+ * como los emojis de la portada: sin terceros de por medio (ver
+ * /aviso-legal). Aquí va en webp, que pesa la mitad que el png; el png existe
+ * igualmente porque el icono de la pestaña y la vista previa de WhatsApp no
+ * admiten webp (ver scripts/render-og.mjs).
+ *
+ * Va con `<img>` y no con `next/image` porque son 16 kB que queremos servidos
+ * tal cual y de inmediato — es justo la imagen que aparece cuando algo está
+ * tardando, así que pasarla por el optimizador para ahorrar unos bytes sería
+ * pagar una petición extra en el peor momento.
  *
  * No es un <dialog> ni atrapa el foco a propósito: no hay nada que pulsar
  * aquí dentro y robarle el foco a quien navega con teclado, para devolvérselo
@@ -39,7 +19,7 @@ function Carrito({ className }: { className?: string }) {
  * se anuncia con `role="status"`.
  *
  * Las animaciones van con `motion-safe:`: quien tenga puesto "reducir
- * movimiento" en su sistema ve el carrito quieto y el texto igual.
+ * movimiento" en su sistema lo ve quieto y el texto igual.
  */
 export function Loader({
   texto = 'Bababueta está llegando…',
@@ -53,13 +33,22 @@ export function Loader({
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
     >
       <div className="flex w-full max-w-xs flex-col items-center gap-5 rounded-2xl border bg-card p-6 text-center">
-        {/* La pista: 12rem de ancho, el carrito ocupa 2 y recorre las 10 que
+        {/* La pista: 12rem de ancho, el cacahuete ocupa 2 y recorre las 10 que
             quedan (--recorrido, que es lo que leen los fotogramas). */}
         <div className="relative h-10 w-48 [--recorrido:10rem]">
           <span className="absolute inset-x-0 bottom-0 border-b border-dashed" />
           <span className="absolute bottom-1 left-0 motion-safe:animate-paseo">
-            <span className="block text-primary-ink motion-safe:animate-bache">
-              <Carrito className="size-8" />
+            <span className="block motion-safe:animate-bache">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/peanut.webp"
+                alt=""
+                aria-hidden
+                width={32}
+                height={32}
+                fetchPriority="high"
+                className="size-8"
+              />
             </span>
           </span>
         </div>

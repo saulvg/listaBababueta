@@ -2,6 +2,7 @@ import { ApiError, jsonOk } from '@/lib/api/responses'
 import { route } from '@/lib/api/route'
 import { requireListAccess } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
+import { findListBySlug } from '@/lib/lists/queries'
 
 // GET /api/public/lists/[slug] — la lista que ve la familia.
 //
@@ -14,10 +15,7 @@ type Contexto = { params: Promise<{ slug: string }> }
 export const GET = route<Contexto>(async (_request, { params }) => {
   const { slug } = await params
 
-  const lista = await prisma.list.findUnique({
-    where: { slug },
-    select: { id: true, title: true, slug: true, createdAt: true },
-  })
+  const lista = await findListBySlug(slug)
 
   if (!lista) {
     throw new ApiError(404, 'list_not_found', 'Esa lista no existe.')

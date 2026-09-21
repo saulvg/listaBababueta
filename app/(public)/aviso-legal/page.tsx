@@ -9,7 +9,8 @@ const CONTACTO = 'saulvgproyecto@gmail.com'
 const ACTUALIZADO = 'septiembre de 2026'
 
 export const metadata: Metadata = {
-  title: 'Aviso legal y privacidad · Lista Bababueta',
+  // El "· Lista Bababueta" lo pone la plantilla del layout raíz.
+  title: 'Aviso legal y privacidad',
   description: 'Qué se guarda en esta web, para qué y a quién escribir.',
   // Es una página de trámite: que no salga en Google.
   robots: { index: false, follow: true },
