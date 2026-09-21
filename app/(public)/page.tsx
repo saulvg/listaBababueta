@@ -24,12 +24,12 @@ export default function HomePage() {
           <br />
           Puedes cotillear lo que hemos considerado que va a necesitar{' '}
           <EmojiAnimado src="/ojos.webp" fallback="👀" />. Es solo una guía por
-          si te apetece regalarle algo. <br /> Si ves algo que te hace ilusión
+          si te apetece regalarle algo. <br /> Si ves algo que te hace ilusión,
           adelante <EmojiAnimado src="/billetes.webp" fallback="💸" />
           <br /> <br />
           <span className="font-bold text-warning">IMPORTANTE:</span> Marca como
-          comprado una vez te decidas, antes incluso de haberlo comprado asi si
-          alguien a decidio lo mismo que tu, no podra repetirlo.
+          comprado una vez te decidas, antes incluso de haberlo comprado. Así,
+          si alguien ha decidido lo mismo que tú, no podrá repetirlo.
         </p>
       </div>
 
