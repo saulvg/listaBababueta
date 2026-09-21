@@ -2,7 +2,10 @@ import { PrismaNeon } from '@prisma/adapter-neon'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { PrismaClient } from '@/lib/generated/prisma/client'
-import { markProductAsPurchased } from '@/lib/products/purchase'
+import {
+  markProductAsPurchased,
+  unmarkProductAsPurchased,
+} from '@/lib/products/purchase'
 
 // Estos tests hablan con una base de datos Postgres de verdad (la rama `test`
 // de Neon). No se simula: un mock no puede demostrar atomicidad, que es
@@ -168,5 +171,70 @@ describe('markProductAsPurchased', () => {
     })
 
     expect(resultado).toMatchObject({ ok: false, reason: 'not_found' })
+  })
+})
+
+// Desmarcar es la otra mitad de la misma garantía: si escribiera el estado
+// sin condición, un desmarcado a destiempo podría borrar una compra recién
+// hecha y dejar dos personas convencidas de que el regalo es suyo.
+describe('unmarkProductAsPurchased', () => {
+  it('devuelve un regalo comprado a disponible y lo deja comprable', async () => {
+    const producto = await crearProductoDisponible()
+    await markProductAsPurchased(db, {
+      productId: producto.id,
+      purchasedBy: 'Carmen',
+    })
+
+    const resultado = await unmarkProductAsPurchased(db, {
+      productId: producto.id,
+    })
+
+    expect(resultado.ok).toBe(true)
+
+    const enBd = await db.product.findUniqueOrThrow({
+      where: { id: producto.id },
+    })
+    expect(enBd.status).toBe('DISPONIBLE')
+    // No basta con el estado: si quedara el nombre, la lista seguiría
+    // diciendo "comprado por Carmen" al lado de un regalo disponible.
+    expect(enBd.purchasedBy).toBeNull()
+    expect(enBd.purchasedAt).toBeNull()
+
+    const segundaCompra = await markProductAsPurchased(db, {
+      productId: producto.id,
+      purchasedBy: 'Luis',
+    })
+    expect(segundaCompra.ok).toBe(true)
+  })
+
+  it('ante desmarcados simultáneos, solo uno gana', async () => {
+    const producto = await crearProductoDisponible()
+    await markProductAsPurchased(db, {
+      productId: producto.id,
+      purchasedBy: 'Carmen',
+    })
+
+    const resultados = await Promise.all(
+      [1, 2, 3].map(() =>
+        unmarkProductAsPurchased(db, { productId: producto.id }),
+      ),
+    )
+
+    expect(resultados.filter((r) => r.ok)).toHaveLength(1)
+    for (const perdedor of resultados.filter((r) => !r.ok)) {
+      expect(perdedor).toMatchObject({ reason: 'not_purchased' })
+    }
+  })
+
+  it('distingue un producto inexistente de uno que no estaba comprado', async () => {
+    const disponible = await crearProductoDisponible()
+
+    expect(
+      await unmarkProductAsPurchased(db, { productId: disponible.id }),
+    ).toMatchObject({ ok: false, reason: 'not_purchased' })
+
+    expect(
+      await unmarkProductAsPurchased(db, { productId: 'no-existe' }),
+    ).toMatchObject({ ok: false, reason: 'not_found' })
   })
 })

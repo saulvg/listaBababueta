@@ -15,18 +15,30 @@ import { createListSchema } from '@/lib/validations/list'
 export const GET = route(async () => {
   await requireParent()
 
-  const listas = await prisma.list.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      // El panel enseña "4 regalos, 1 comprado" sin traerse los productos.
-      _count: { select: { products: true } },
-    },
-  })
+  // El panel enseña "4 regalos · 1 comprado" sin traerse los productos. Van
+  // dos consultas y no una porque Prisma no deja contar dos veces la misma
+  // relación con filtros distintos dentro del mismo `_count`.
+  const [listas, comprados] = await Promise.all([
+    prisma.list.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { _count: { select: { products: true } } },
+    }),
+    prisma.product.groupBy({
+      by: ['listId'],
+      where: { status: 'COMPRADO' },
+      _count: { _all: true },
+    }),
+  ])
+
+  const compradosPorLista = new Map(
+    comprados.map((fila) => [fila.listId, fila._count._all]),
+  )
 
   return jsonOk({
     lists: listas.map(({ _count, ...lista }) => ({
       ...lista,
       productCount: _count.products,
+      purchasedCount: compradosPorLista.get(lista.id) ?? 0,
     })),
   })
 })

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Indie_Flower } from 'next/font/google'
 import './globals.css'
+
+import { SCRIPT_DE_TEMA } from '@/lib/theme'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -9,6 +11,13 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
+
+// Los titulares, manuscritos. Un solo grosor, como la anterior.
+const indieFlower = Indie_Flower({
+  variable: '--font-indie-flower',
+  weight: '400',
   subsets: ['latin'],
 })
 
@@ -21,9 +30,18 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // El script de abajo toca la clase del <html> antes de que React
+      // hidrate, así que el aviso de "esto no coincide con el servidor" es
+      // esperado y hay que callarlo aquí.
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${indieFlower.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        {/* Aplica el tema antes del primer pintado: sin esto, quien tenga el
+            modo oscuro puesto ve un fogonazo blanco en cada carga. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_DE_TEMA }} />
+      </head>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   )
 }
