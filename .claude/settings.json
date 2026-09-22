@@ -4,7 +4,8 @@
       "Bash(pnpm format *)",
       "Bash(pnpm typecheck *)",
       "Bash(pnpm lint *)",
-      "Bash(pnpm format:check)"
+      "Bash(pnpm format:check)",
+      "Bash(pnpm test *)"
     ],
     "deny": [
       "Read(./.env)",

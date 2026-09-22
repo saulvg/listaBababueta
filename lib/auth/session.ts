@@ -93,6 +93,20 @@ export async function requireParent(): Promise<ParentAccount> {
   return { email: sesion.email }
 }
 
+/**
+ * ¿Hay sesión de padres abierta?
+ *
+ * La versión sin excepción de requireParent, para las decisiones que no son
+ * "corta aquí" sino "enseña una cosa u otra". La usa la visibilidad de las
+ * listas ocultas (lib/lists/queries.ts): una lista oculta existe para los
+ * padres y no existe para nadie más, y eso no es un 403, es otra respuesta.
+ */
+export async function isParent(): Promise<boolean> {
+  const sesion = await getParentSession()
+
+  return Boolean(sesion.email)
+}
+
 /** Anota en la cookie que este navegador ha acertado la clave de una lista. */
 export async function grantListAccess(listId: string): Promise<void> {
   const sesion = await getGuestSession()
@@ -118,8 +132,7 @@ export async function requireListAccess(listId: string): Promise<void> {
 
   if (sesion.unlockedListIds?.includes(listId)) return
 
-  const padres = await getParentSession()
-  if (padres.email) return
+  if (await isParent()) return
 
   throw new ApiError(
     403,

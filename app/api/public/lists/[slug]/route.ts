@@ -2,7 +2,7 @@ import { ApiError, jsonOk } from '@/lib/api/responses'
 import { route } from '@/lib/api/route'
 import { requireListAccess } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
-import { findListBySlug } from '@/lib/lists/queries'
+import { findVisibleListBySlug } from '@/lib/lists/queries'
 
 // GET /api/public/lists/[slug] — la lista que ve la familia.
 //
@@ -15,7 +15,10 @@ type Contexto = { params: Promise<{ slug: string }> }
 export const GET = route<Contexto>(async (_request, { params }) => {
   const { slug } = await params
 
-  const lista = await findListBySlug(slug)
+  // Devuelve null también si la lista está oculta y quien pregunta no es uno
+  // de los padres: para la familia una lista oculta y una lista inventada son
+  // exactamente lo mismo, y este 404 es el que lo hace cierto.
+  const lista = await findVisibleListBySlug(slug)
 
   if (!lista) {
     throw new ApiError(404, 'list_not_found', 'Esa lista no existe.')
@@ -27,7 +30,7 @@ export const GET = route<Contexto>(async (_request, { params }) => {
 
   const productos = await prisma.product.findMany({
     where: { listId: lista.id },
-    orderBy: { createdAt: 'asc' },
+    orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
     select: {
       id: true,
       title: true,

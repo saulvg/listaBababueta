@@ -2,6 +2,7 @@ import { ApiError, jsonOk } from '@/lib/api/responses'
 import { parseBody, route } from '@/lib/api/route'
 import { requireParent } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
+import { nextProductPosition } from '@/lib/products/order'
 import { createProductSchema } from '@/lib/validations/product'
 
 // /api/admin/lists/[listId]/products — productos de una lista. Solo padres.
@@ -18,7 +19,7 @@ export const GET = route<Contexto>(async (_request, { params }) => {
 
   const productos = await prisma.product.findMany({
     where: { listId },
-    orderBy: { createdAt: 'asc' },
+    orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })
 
   return jsonOk({ products: productos })
@@ -41,7 +42,13 @@ export const POST = route<Contexto>(async (request, { params }) => {
     throw new ApiError(404, 'list_not_found', 'Esa lista no existe.')
   }
 
-  const producto = await prisma.product.create({ data: { ...datos, listId } })
+  // Al final de la lista: los regalos se apuntan según se le ocurren a uno y
+  // ese orden ya es el bueno (ver lib/products/order.ts).
+  const position = await nextProductPosition(listId)
+
+  const producto = await prisma.product.create({
+    data: { ...datos, listId, position },
+  })
 
   return jsonOk({ product: producto }, 201)
 })

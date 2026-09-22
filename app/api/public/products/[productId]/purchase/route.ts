@@ -5,6 +5,7 @@ import { parseBody, route } from '@/lib/api/route'
 import { requireListAccess } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
 import { enviarAvisoDeCompra } from '@/lib/email/purchase-notification'
+import { esVisible } from '@/lib/lists/queries'
 import { markProductAsPurchased } from '@/lib/products/purchase'
 import { purchaseProductSchema } from '@/lib/validations/product'
 
@@ -28,11 +29,15 @@ export const POST = route<Contexto>(async (request, { params }) => {
     select: {
       id: true,
       title: true,
-      list: { select: { id: true, title: true, slug: true } },
+      list: { select: { id: true, title: true, slug: true, hidden: true } },
     },
   })
 
-  if (!producto) {
+  // Una lista oculta no se puede leer (ver el GET de al lado) ni tampoco
+  // escribir. No basta con que la pantalla no se pinte: la URL de un regalo se
+  // queda guardada en la conversación de WhatsApp, y un POST a mano desde ahí
+  // dejaría marcas de compra en una lista que los padres ya habían archivado.
+  if (!producto || !(await esVisible(producto.list))) {
     throw new ApiError(
       404,
       'product_not_found',

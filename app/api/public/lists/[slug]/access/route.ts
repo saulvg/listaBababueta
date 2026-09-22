@@ -2,6 +2,7 @@ import { ApiError, jsonError, jsonOk } from '@/lib/api/responses'
 import { parseBody, route } from '@/lib/api/route'
 import { grantListAccess } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
+import { esVisible } from '@/lib/lists/queries'
 import { clientIp, enforceRateLimit, resetRateLimit } from '@/lib/rate-limit'
 import { listAccessSchema } from '@/lib/validations/list'
 
@@ -35,11 +36,17 @@ export const POST = route<Contexto>(async (request, { params }) => {
       title: true,
       slug: true,
       shippingAddress: true,
+      hidden: true,
       accessKey: true,
     },
   })
 
-  if (!lista) {
+  // Consulta propia y no findVisibleListBySlug porque aquí hace falta además
+  // la clave, así que la comprobación de visibilidad se hace a mano con la
+  // misma pieza. El `!lista` y la lista oculta dan el MISMO 404 a propósito:
+  // acertar la clave de una lista oculta no puede ser la forma de descubrir
+  // que existe.
+  if (!lista || !(await esVisible(lista))) {
     throw new ApiError(404, 'list_not_found', 'Esa lista no existe.')
   }
 

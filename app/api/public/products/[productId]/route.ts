@@ -2,6 +2,7 @@ import { ApiError, jsonOk } from '@/lib/api/responses'
 import { route } from '@/lib/api/route'
 import { requireListAccess } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
+import { esVisible } from '@/lib/lists/queries'
 
 // GET /api/public/products/[productId] — un regalo suelto.
 //
@@ -36,12 +37,30 @@ export const GET = route<Contexto>(async (_request, { params }) => {
       // qué volver a la lista a buscarla. Sale después de requireListAccess,
       // nunca antes.
       list: {
-        select: { id: true, title: true, slug: true, shippingAddress: true },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          shippingAddress: true,
+          hidden: true,
+        },
       },
     },
   })
 
   if (!producto) {
+    throw new ApiError(
+      404,
+      'product_not_found',
+      'Ese regalo ya no está en la lista.',
+    )
+  }
+
+  // Si la lista está oculta, sus regalos se ocultan con ella. Sin esto, el
+  // enlace directo a un regalo sería la rendija por la que seguir viendo una
+  // lista archivada: la URL de un regalo se comparte por WhatsApp igual que la
+  // de la lista, y quedan guardadas en las conversaciones para siempre.
+  if (!(await esVisible(producto.list))) {
     throw new ApiError(
       404,
       'product_not_found',
@@ -57,5 +76,15 @@ export const GET = route<Contexto>(async (_request, { params }) => {
 
   const { list, ...regalo } = producto
 
-  return jsonOk({ product: regalo, list })
+  // `hidden` se queda aquí: es un dato del panel, y a la familia solo le llega
+  // lo que la pantalla del regalo necesita pintar.
+  return jsonOk({
+    product: regalo,
+    list: {
+      id: list.id,
+      title: list.title,
+      slug: list.slug,
+      shippingAddress: list.shippingAddress,
+    },
+  })
 })

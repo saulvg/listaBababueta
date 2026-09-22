@@ -40,6 +40,18 @@ const direccionEnvio = z
   .nullable()
   .transform((valor) => valor || null)
 
+/**
+ * Si la lista está oculta a la familia. Ojo con lo que significa: no es "no
+ * listada", es invisible del todo, también por su enlace directo y aunque se
+ * tenga la clave. El porqué está en el campo `hidden` del esquema de Prisma.
+ *
+ * Solo en el PATCH y no al crear: se ocultan y se enseñan desde el botón del
+ * ojo de cada tarjeta del panel, y una lista nace visible. Si algún día hace
+ * falta crearla ya oculta, esto se añade abajo; mientras tanto no está para
+ * que no haya un camino que nadie recorre.
+ */
+const oculta = z.boolean('Indica si la lista está oculta o no.')
+
 export const createListSchema = z.object({
   title: titulo,
   accessKey: claveAcceso,
@@ -58,6 +70,7 @@ export const updateListSchema = z
     // se borra. Si esto fuera `.nullish()`, un PATCH que solo cambiara el
     // título se llevaría por delante la dirección guardada.
     shippingAddress: direccionEnvio.optional(),
+    hidden: oculta.optional(),
   })
   // Un PATCH sin ningún campo no es un error de datos pero sí una llamada
   // inútil: mejor decirlo que devolver un 200 que no ha cambiado nada.
@@ -70,6 +83,26 @@ export const listAccessSchema = z.object({
   accessKey: claveAcceso,
 })
 
+/**
+ * El orden nuevo de las listas, de la primera a la última, tal y como han
+ * quedado en el panel después de arrastrar una tarjeta.
+ *
+ * Van TODOS los ids y no solo el de la tarjeta movida, a propósito: es lo que
+ * deja al servidor comprobar que el navegador estaba viendo lo mismo que hay
+ * guardado antes de reescribir nada (ver lib/reorder.ts).
+ *
+ * El tope de 500 es defensivo y nada más. Este cuerpo lo escribe el navegador,
+ * no una persona, así que aquí no hay un mensaje que enseñar: si salta es que
+ * algo va mal por nuestra parte.
+ */
+export const reorderListsSchema = z.object({
+  ids: z
+    .array(z.string().min(1, 'Hay un identificador vacío.'))
+    .min(1, 'No hay nada que ordenar.')
+    .max(500, 'Demasiadas listas en una sola petición.'),
+})
+
 export type CreateListInput = z.infer<typeof createListSchema>
 export type UpdateListInput = z.infer<typeof updateListSchema>
 export type ListAccessInput = z.infer<typeof listAccessSchema>
+export type ReorderListsInput = z.infer<typeof reorderListsSchema>
