@@ -1,0 +1,12 @@
+{
+  // Obliga a VS Code a usar el TypeScript del proyecto (5.9.3) en vez del que
+  // trae empaquetado. Con los enlaces simbólicos de pnpm, la versión ajena es
+  // la que pierde node_modules al reindexar, y el síntoma es media app en rojo
+  // con "No se encuentra el módulo next/link" mientras `pnpm typecheck` pasa
+  // limpio. Aquí eso se dispara con facilidad: `prisma generate` reescribe
+  // lib/generated/ entero en cada instalación y en cada migración.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  // Pregunta una vez, al abrir el proyecto, si se quiere usar esa versión. Hay
+  // que aceptarlo: sin el sí, la línea de arriba no llega a aplicarse.
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
