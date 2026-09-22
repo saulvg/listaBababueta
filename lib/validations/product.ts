@@ -99,6 +99,24 @@ export const purchaseProductSchema = z.object({
     .nullish(),
 })
 
+/**
+ * El orden nuevo de los regalos de UNA lista, del primero al último, tal y
+ * como han quedado tras arrastrar una tarjeta en el panel.
+ *
+ * Gemelo de reorderListsSchema (ver lib/validations/list.ts, donde está
+ * explicado por qué viajan todos los ids y no solo el que se ha movido). Se
+ * repite aquí en vez de compartirse porque la convención del proyecto es un
+ * fichero de validación por entidad, y cuatro líneas no justifican un tercer
+ * fichero que ninguna de las dos entidades reclame como suyo.
+ */
+export const reorderProductsSchema = z.object({
+  ids: z
+    .array(z.string().min(1, 'Hay un identificador vacío.'))
+    .min(1, 'No hay nada que ordenar.')
+    .max(1000, 'Demasiados regalos en una sola petición.'),
+})
+
 export type CreateProductInput = z.infer<typeof createProductSchema>
 export type UpdateProductInput = z.infer<typeof updateProductSchema>
 export type PurchaseProductInput = z.infer<typeof purchaseProductSchema>
+export type ReorderProductsInput = z.infer<typeof reorderProductsSchema>

@@ -20,7 +20,14 @@ export const GET = route(async () => {
   const desbloqueadas = new Set(sesion.unlockedListIds ?? [])
 
   const listas = await prisma.list.findMany({
-    orderBy: { createdAt: 'desc' },
+    // Las ocultas no salen aquí NI SIQUIERA para los padres, y es a propósito.
+    // Esta pantalla enseña lo que ve la familia, así que dejarla igual para
+    // todo el mundo la convierte en la forma de comprobar de un vistazo que
+    // ocultar una lista ha surtido efecto. Los padres la siguen viendo entera
+    // en /panel, que es su sitio, y entrando por su enlace directo.
+    where: { hidden: false },
+    // El orden lo deciden los padres desde el panel; la fecha solo desempata.
+    orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
     select: {
       id: true,
       title: true,

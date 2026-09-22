@@ -3,6 +3,7 @@ import { parseBody, route } from '@/lib/api/route'
 import { requireParent } from '@/lib/auth/session'
 import { prisma } from '@/lib/db'
 import { RESTRICCION_UNICA, esErrorPrisma } from '@/lib/db-errors'
+import { nextListPosition } from '@/lib/lists/order'
 import { generarSlugUnico } from '@/lib/lists/slug'
 import { createListSchema } from '@/lib/validations/list'
 
@@ -20,7 +21,11 @@ export const GET = route(async () => {
   // relación con filtros distintos dentro del mismo `_count`.
   const [listas, comprados] = await Promise.all([
     prisma.list.findMany({
-      orderBy: { createdAt: 'desc' },
+      // El orden lo mandan los padres arrastrando las tarjetas. La fecha es
+      // solo el desempate: dos listas creadas a la vez pueden compartir
+      // posición (ver lib/lists/order.ts) y sin esto se turnarían al azar en
+      // cada recarga. `desc` porque es el orden que tenía el panel antes.
+      orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
       include: { _count: { select: { products: true } } },
     }),
     prisma.product.groupBy({
@@ -48,9 +53,13 @@ export const POST = route(async (request) => {
 
   const datos = await parseBody(request, createListSchema)
   const slug = await generarSlugUnico(prisma, datos.title)
+  // Arriba del todo, que es donde va a mirar quien acaba de crearla.
+  const position = await nextListPosition()
 
   try {
-    const lista = await prisma.list.create({ data: { ...datos, slug } })
+    const lista = await prisma.list.create({
+      data: { ...datos, slug, position },
+    })
     return jsonOk({ list: lista }, 201)
   } catch (error) {
     // generarSlugUnico consulta antes de insertar, así que esto solo salta si

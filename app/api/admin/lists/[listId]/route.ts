@@ -17,7 +17,12 @@ export const GET = route<Contexto>(async (_request, { params }) => {
 
   const lista = await prisma.list.findUnique({
     where: { id: listId },
-    include: { products: { orderBy: { createdAt: 'asc' } } },
+    // Mismo criterio que en el índice: manda la posición que dejaron los
+    // padres y la fecha solo desempata. `asc` porque es el orden que tenía la
+    // lista antes de que se pudiera reordenar a mano.
+    include: {
+      products: { orderBy: [{ position: 'asc' }, { createdAt: 'asc' }] },
+    },
   })
 
   if (!lista) throw NO_EXISTE

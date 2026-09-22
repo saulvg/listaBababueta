@@ -31,6 +31,21 @@ model List {
   /// cuánto cuentan — la dirección entera o un "escríbenos y te la pasamos".
   /// Solo sale tras la clave de la lista; nunca en el índice público.
   shippingAddress String? @map("shipping_address")
+  /// Orden en el panel y en el índice público, el que dejan los padres
+  /// arrastrando las tarjetas. Ordena de menor a mayor.
+  ///
+  /// NO es un número de fila: los huecos y los negativos están permitidos a
+  /// propósito. Una lista nueva entra en (mínimo - 1) para quedarse arriba,
+  /// que es donde se mira, sin tener que reescribir la fila de todas las demás
+  /// solo para hacerle sitio. Quien lea esto ordenando, que no cuente huecos.
+  position  Int      @default(0)
+  /// Oculta a la familia. Ojo con el alcance: no es "no listada", es invisible
+  /// del todo. La lista desaparece de /listas Y de /lista/<slug>, que responde
+  /// "esa lista no existe" aunque quien llame tenga el enlace y haya acertado
+  /// la clave (ver lib/lists/queries.ts). Los padres la siguen viendo entera
+  /// desde el panel: sirve para archivar los Reyes del año pasado sin perder
+  /// quién compró qué.
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -63,6 +78,11 @@ model Product {
   /// URL de una imagen externa. No hay subida de ficheros (CLAUDE.md §3).
   imageUrl   String? @map("image_url")
 
+  /// Orden dentro de SU lista (ver el mismo campo en List). Aquí el regalo
+  /// nuevo entra en (máximo + 1), al final: los regalos se van apuntando según
+  /// se le ocurren a uno, y ese orden ya es el bueno mientras no se toque.
+  position Int @default(0)
+
   status ProductStatus @default(DISPONIBLE)
   /// Texto libre. Nulo o vacío = compra anónima.
   purchasedBy String?   @map("purchased_by")
@@ -83,7 +103,9 @@ model Product {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // La vista pública siempre filtra por lista.
-  @@index([listId])
+  // La vista pública siempre filtra por lista y ordena por posición. El índice
+  // compuesto sirve para las dos cosas y también para un filtro por listId a
+  // secas, así que sustituye al de solo listId en vez de sumarse a él.
+  @@index([listId, position])
   @@map("products")
 }

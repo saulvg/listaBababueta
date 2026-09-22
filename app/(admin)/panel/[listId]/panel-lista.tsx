@@ -1,8 +1,8 @@
 'use client'
 
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { BackLink } from '@/components/back-link'
 import { ConfirmDialog } from '@/components/confirm-dialog'
@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button'
 import { api, esCodigo, mensajeDeError } from '@/lib/api/client'
 import type { AdminListDetailResponse, Product } from '@/lib/api/types'
 import { useApi } from '@/lib/hooks/use-api'
+import { useOrdenable } from '@/lib/hooks/use-ordenable'
+import { cn } from '@/lib/utils'
 
 import { DialogoProducto } from './dialogo-producto'
 
@@ -35,6 +37,28 @@ export function PanelLista({ listId }: { listId: string }) {
   const [aBorrar, setABorrar] = useState<Product | null>(null)
   const [errorBorrado, setErrorBorrado] = useState<string | null>(null)
   const [borrando, setBorrando] = useState(false)
+
+  const guardarOrden = useCallback(
+    (ids: string[]) =>
+      api.patch(
+        `/api/admin/lists/${encodeURIComponent(listId)}/products/order`,
+        { ids },
+      ),
+    [listId],
+  )
+
+  const {
+    orden,
+    arrastrando,
+    error: errorOrden,
+    refDeCaja,
+    propsDeTirador,
+    anuncio,
+  } = useOrdenable<Product>({
+    items: datos?.list.products ?? [],
+    nombreDe: (producto) => producto.title,
+    onOrdenar: guardarOrden,
+  })
 
   useEffect(() => {
     if (esCodigo(error, 'unauthorized')) router.replace('/entrar')
@@ -57,8 +81,12 @@ export function PanelLista({ listId }: { listId: string }) {
     }
   }
 
-  const regalos = datos?.list.products ?? []
-  const visibles = filtrarRegalos(regalos, filtro)
+  // Solo se reordena con la lista entera a la vista. Con un filtro puesto, el
+  // hueco donde se suelta una tarjeta no dice dónde cae de verdad: entre las
+  // dos que se ven puede haber tres que no, y el regalo acabaría en un sitio
+  // que nadie ha elegido.
+  const sePuedeOrdenar = filtro === 'todos' && orden.length > 1
+  const visibles = filtrarRegalos(orden, filtro)
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-16 sm:px-6">
@@ -80,13 +108,26 @@ export function PanelLista({ listId }: { listId: string }) {
         <Notice>{mensajeDeError(error)}</Notice>
       ) : null}
 
-      {datos && regalos.length > 0 && (
-        <GiftFilter
-          valor={filtro}
-          onChange={setFiltro}
-          conteos={contarRegalos(regalos)}
-          className="mb-4"
-        />
+      {errorOrden ? <Notice className="mb-4">{errorOrden}</Notice> : null}
+
+      <p aria-live="polite" className="sr-only">
+        {anuncio}
+      </p>
+
+      {datos && orden.length > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <GiftFilter
+            valor={filtro}
+            onChange={setFiltro}
+            conteos={contarRegalos(orden)}
+          />
+
+          {filtro !== 'todos' && orden.length > 1 && (
+            <p className="text-xs text-muted-foreground">
+              Para cambiarlos de orden, vuelve a «Todos».
+            </p>
+          )}
+        </div>
       )}
 
       {datos && visibles.length === 0 && filtro !== 'todos' && (
@@ -100,11 +141,29 @@ export function PanelLista({ listId }: { listId: string }) {
       {datos && (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibles.map((producto) => (
-            <li key={producto.id} className="flex">
+            <li
+              key={producto.id}
+              ref={refDeCaja(producto.id)}
+              className={cn(
+                'relative flex',
+                arrastrando === producto.id &&
+                  'z-20 cursor-grabbing select-none *:shadow-lg *:ring-2 *:ring-ring/50',
+              )}
+            >
               <GiftCard
                 product={producto}
                 actions={
                   <>
+                    {sePuedeOrdenar && (
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-grab bg-background/80 text-muted-foreground backdrop-blur active:cursor-grabbing"
+                        {...propsDeTirador(producto)}
+                      >
+                        <GripVertical aria-hidden />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon-sm"

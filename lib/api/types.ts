@@ -46,6 +46,10 @@ export type ListHeader = {
  *  a compartir con la familia (por eso se guarda en texto plano). */
 export type ListRecord = ListHeader & {
   accessKey: string
+  /** Oculta a la familia: fuera de /listas y con 404 en su enlace directo.
+   *  Cuelga de aquí y no de ListHeader a propósito — es un dato del panel, y
+   *  a la familia no le llega en ninguna respuesta. */
+  hidden: boolean
   updatedAt: string
 }
 

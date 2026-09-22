@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { findListBySlug } from '@/lib/lists/queries'
+import { findVisibleListBySlug } from '@/lib/lists/queries'
 import { AVISO_DE_CLAVE, OPEN_GRAPH_BASE } from '@/lib/metadata'
 
 import { VistaLista } from './vista-lista'
@@ -21,7 +21,11 @@ export async function generateMetadata({
   params,
 }: PageProps<'/lista/[slug]'>): Promise<Metadata> {
   const { slug } = await params
-  const lista = await findListBySlug(slug)
+  // Una lista oculta vuelve null aquí igual que una inexistente, y es
+  // importante que sea en este sitio: si no, el título de una lista archivada
+  // seguiría saliendo en la vista previa del enlace pegado en WhatsApp meses
+  // después de haberla ocultado.
+  const lista = await findVisibleListBySlug(slug)
 
   if (!lista) {
     return { title: 'Esa lista no existe' }
