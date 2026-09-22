@@ -152,7 +152,7 @@ export function VistaRegalo({
         {datos ? datos.list.title : 'Volver a la lista'}
       </BackLink>
 
-      {cargando && <Loader texto="Vamos a por ese regalo…" />}
+      {cargando && <Loader />}
 
       {error && !cargando ? <Notice>{mensajeDeError(error)}</Notice> : null}
 

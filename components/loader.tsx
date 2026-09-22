@@ -21,11 +21,7 @@
  * Las animaciones van con `motion-safe:`: quien tenga puesto "reducir
  * movimiento" en su sistema lo ve quieto y el texto igual.
  */
-export function Loader({
-  texto = 'Bababueta está llegando…',
-}: {
-  texto?: string
-}) {
+export function Loader() {
   return (
     <div
       role="status"
@@ -53,7 +49,10 @@ export function Loader({
           </span>
         </div>
 
-        <p className="font-heading text-lg">{texto}</p>
+        {/* El mismo texto en toda la app, a propósito: la espera de una ruta
+            y la de sus datos son dos pantallas seguidas, y cambiar de frase a
+            mitad del giro parece un error aunque no lo sea. */}
+        <p className="font-heading text-lg">Bababueta está llegando…</p>
       </div>
     </div>
   )

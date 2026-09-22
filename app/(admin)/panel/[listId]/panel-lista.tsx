@@ -102,7 +102,7 @@ export function PanelLista({ listId }: { listId: string }) {
         )}
       </header>
 
-      {cargando && <Loader texto="Contando los regalos…" />}
+      {cargando && <Loader />}
 
       {error && !esCodigo(error, 'unauthorized') ? (
         <Notice>{mensajeDeError(error)}</Notice>

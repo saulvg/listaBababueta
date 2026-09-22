@@ -128,7 +128,7 @@ export default function PanelPage() {
         </Button>
       </header>
 
-      {cargando && <Loader texto="Abriendo vuestras listas…" />}
+      {cargando && <Loader />}
 
       {error && !esCodigo(error, 'unauthorized') ? (
         <Notice>{mensajeDeError(error)}</Notice>
