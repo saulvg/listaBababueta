@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  Check,
-  Eye,
-  EyeOff,
-  GripVertical,
-  Link2,
-  Pencil,
-  Plus,
-} from 'lucide-react'
+import { Check, Eye, EyeOff, Move, Link2, Pencil, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -191,7 +183,7 @@ export default function PanelPage() {
                       className="cursor-grab text-muted-foreground active:cursor-grabbing"
                       {...propsDeTirador(lista)}
                     >
-                      <GripVertical aria-hidden />
+                      <Move aria-hidden />
                     </Button>
 
                     <Button

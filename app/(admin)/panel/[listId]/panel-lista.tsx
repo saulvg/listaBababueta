@@ -1,6 +1,6 @@
 'use client'
 
-import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Move, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -161,7 +161,7 @@ export function PanelLista({ listId }: { listId: string }) {
                         className="cursor-grab bg-background/80 text-muted-foreground backdrop-blur active:cursor-grabbing"
                         {...propsDeTirador(producto)}
                       >
-                        <GripVertical aria-hidden />
+                        <Move aria-hidden />
                       </Button>
                     )}
                     <Button
